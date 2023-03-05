@@ -1,14 +1,21 @@
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import {
+    Column,
+    Entity,
+    PrimaryColumn,
+    PrimaryGeneratedColumn,
+    Unique,
+} from 'typeorm';
 
 @Entity()
 export class Blade {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column('text')
+    @Column({
+        unique: true,
+    })
     name: string;
 
-    @Column('text')
+    @Column()
     element: string;
-
 }

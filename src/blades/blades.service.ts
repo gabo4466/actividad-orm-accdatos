@@ -1,26 +1,65 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateBladeDto } from './dto/create-blade.dto';
 import { UpdateBladeDto } from './dto/update-blade.dto';
+import { Blade } from './entities/blade.entity';
 
 @Injectable()
 export class BladesService {
-  create(createBladeDto: CreateBladeDto) {
-    return 'This action adds a new blade';
-  }
+    constructor(
+        @InjectRepository(Blade)
+        private bladesRepository: Repository<Blade>,
+    ) {}
 
-  findAll() {
-    return `This action returns all blades`;
-  }
+    async create(createBladeDto: CreateBladeDto): Promise<Blade> {
+        try {
+            const blade = new Blade();
+            blade.name = createBladeDto.name;
+            blade.element = createBladeDto.element;
 
-  findOne(id: number) {
-    return `This action returns a #${id} blade`;
-  }
+            return await this.bladesRepository.save(blade);
+        } catch (error) {
+            throw new InternalServerErrorException();
+        }
+    }
 
-  update(id: number, updateBladeDto: UpdateBladeDto) {
-    return `This action updates a #${id} blade`;
-  }
+    async findAll(): Promise<Blade[]> {
+        try {
+            return await this.bladesRepository.find();
+        } catch (error) {
+            throw new InternalServerErrorException();
+        }
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} blade`;
-  }
+    async findOneById(id: string): Promise<Blade> {
+        try {
+            return await this.bladesRepository.findOne({
+                where: {
+                    id,
+                },
+            });
+        } catch (error) {
+            throw new InternalServerErrorException();
+        }
+    }
+
+    async update(id: string, updateBladeDto: UpdateBladeDto): Promise<Blade> {
+        try {
+            return await this.bladesRepository.save({
+                id,
+                ...updateBladeDto,
+            });
+        } catch (error) {
+            throw new InternalServerErrorException();
+        }
+    }
+
+    async remove(id: number) {
+        try {
+            return await this.bladesRepository.delete(id);
+        } catch (error) {
+            throw new InternalServerErrorException();
+        }
+    }
 }
